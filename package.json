@@ -1,0 +1,16 @@
+{
+  "name": "ecosplit-enterprise",
+  "version": "1.0.0",
+  "description": "Context-Aware Team Expense & Travel Settlement Agent for Microsoft 365 Copilot using Work IQ",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest"
+  },
+  "keywords": ["enterprise-agents", "m365-copilot", "work-iq", "expense-splitting"],
+  "author": "Priyanshi Soni",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
