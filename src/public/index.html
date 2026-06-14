@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoSplit-Enterprise</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #38bdf8; }
+.subtitle { color: #94a3b8; margin-bottom: 2rem; }
+.card { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #334155; }
+label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.4rem; }
+input, textarea { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 1rem; }
+textarea { height: 120px; font-family: monospace; }
+button { background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; width: 100%; }
+button:hover { background: #1d4ed8; }
+.result { margin-top: 1.5rem; }
+.txn { display: flex; justify-content: space-between; padding: 0.75rem; background: #0f172a; border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid #22c55e; }
+.meta { color: #94a3b8; font-size: 0.85rem; margin-bottom: 1rem; }
+.badge { display: inline-block; background: #1e3a5f; color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>💼 EcoSplit-Enterprise</h1>
+  <p class="subtitle">Context-Aware Team Expense Settlement Agent — Powered by Work IQ</p>
+
+  <div class="card">
+    <label>Your Corporate Email</label>
+    <input type="email" id="userId" value="priyanshi@company.com">
+    <label>Receipt Data (JSON)</label>
+    <textarea id="receipt">{
+  "merchant": "Bistro Central",
+  "timestamp": "2026-06-14T20:00:00Z",
+  "totalAmount": 150,
+  "currency": "USD",
+  "lineItems": [
+    {"item": "Pasta", "price": 45},
+    {"item": "Steak", "price": 55},
+    {"item": "Drinks", "price": 30},
+    {"item": "Tax & Tip", "price": 20}
+  ]
+}</textarea>
+    <button onclick="splitExpense()">🚀 Process & Split</button>
+  </div>
+
+  <div id="output"></div>
+</div>
+<script>
+async function splitExpense() {
+  const userId = document.getElementById('userId').value;
+  const receipt = JSON.parse(document.getElementById('receipt').value);
+  const out = document.getElementById('output');
+  out.innerHTML = '<p style="color:#94a3b8">Processing...</p>';
+
+  const res = await fetch('/api/split', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, receipt })
+  });
+  const data = await res.json();
+
+  let html = `<div class="card result">
+    <div class="meta">
+      <span class="badge">${data.meta.securityBoundary}</span>
+      <p style="margin-top:0.5rem"><strong>${data.meta.expenseReason}</strong> at ${data.meta.merchant}</p>
+      <p>Total: $${data.meta.totalAmount} ${data.meta.currency}</p>
+    </div>
+    <h3 style="margin-bottom:0.75rem; color:#22c55e">Settlement Plan</h3>`;
+  
+  data.settlementPlan.forEach(t => {
+    html += `<div class="txn"><span>${t.from}</span><span style="color:#22c55e;font-weight:bold">→ $${t.amount}</span><span>${t.to}</span></div>`;
+  });
+
+  html += '</div>';
+  out.innerHTML = html;
+}
+</script>
+</body>
+</html>
